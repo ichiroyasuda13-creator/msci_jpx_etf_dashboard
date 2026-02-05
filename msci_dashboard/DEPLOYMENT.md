@@ -33,3 +33,10 @@ git push
 Streamlit Cloud will detect your `requirements.txt`, install dependencies (`yfinance`, `plotly`, etc.), and launch the app.
 
 once deployed, you will get a public URL like `https://msci-dashboard-ver1.streamlit.app` that you can share!
+
+## Known Issues (Streamlit Cloud)
+
+**"Fundamental data could not be retrieved" Warning:**
+Yahoo Finance (`yfinance`) aggressively blocks data center IP addresses (like Streamlit Cloud).
+* **Symptoms**: The main table works, but columns like **NAV**, **P/E**, and **AUM** might be empty.
+* **Solution**: The dashboard has a fallback mode to ensure Price/Returns charts and tables still load correctly. For full fundamental data, you can run the app locally.

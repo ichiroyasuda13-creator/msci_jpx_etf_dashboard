@@ -276,12 +276,7 @@ def main():
     
     st.title("MSCI ETF Dashboard Ver.1")
     
-    # Verification Timestamp
-    if not df_prices.empty:
-        last_dt = df_prices.index[-1]
-        st.caption(f"Data as of: {last_dt.strftime('%Y-%m-%d')}")
-    else:
-        st.caption("Data as of: Unknown")
+    # Verification Timestamp (moved later)
 
     st.caption("Tracking JPX-Listed MSCI ETFs")
 
@@ -327,6 +322,13 @@ def main():
     df_fund = get_fundamentals()
     
     status_text.empty()
+
+    # Verification Timestamp (Placed here to ensure df_prices is defined)
+    if not df_prices.empty:
+        last_dt = df_prices.index[-1]
+        st.caption(f"Data as of: {last_dt.strftime('%Y-%m-%d')}")
+    else:
+        st.caption("Data as of: Unknown")
 
     if df_prices.empty:
         st.error("No data available. Please check connections.")

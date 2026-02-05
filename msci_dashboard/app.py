@@ -148,8 +148,26 @@ def fetch_data():
 
 @st.cache_data
 def get_fundamentals():
-    """Fetches fundamental data separately."""
+    """Fetches fundamental data (Snapshot fallback for Cloud)."""
     rows = []
+    
+    # 1. Try Loading Snapshot (Fastest/Safest for Cloud)
+    import json
+    import os
+    
+    # Locate json in the same directory as app.py
+    snapshot_path = os.path.join(os.path.dirname(__file__), 'etf_snapshot.json')
+    
+    if os.path.exists(snapshot_path):
+        try:
+            with open(snapshot_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return pd.DataFrame(data).set_index("Ticker", drop=False)
+        except:
+            pass
+            
+    # 2. Live Fetch (Fallback/Local)
+    # On Streamlit Cloud, this often returns empty or blocks.
     for ticker, meta in ETF_METADATA.items():
         try:
             stock = yf.Ticker(ticker)
@@ -164,7 +182,7 @@ def get_fundamentals():
             
             rows.append({
                 "Index Name": meta["Index"],
-                "ETF Name": meta["Name"], # Use user provided name
+                "ETF Name": meta["Name"], 
                 "Ticker": ticker,
                 "Price": price,
                 "NAV": nav,

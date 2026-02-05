@@ -62,6 +62,8 @@ def fetch_snapshot():
                 premium = ((price - nav) / nav) * 100
                 
             data = {
+                "Index Name": meta["Index"],
+                "ETF Name": meta["Name"],
                 "Ticker": ticker,
                 "Price": price,
                 "NAV": nav,

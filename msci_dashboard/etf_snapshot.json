@@ -1,5 +1,7 @@
 [
   {
+    "Index Name": "MSCI ACWI",
+    "ETF Name": "MAXIS全世界株式(オール・カントリー) 上場投信",
     "Ticker": "2559.T",
     "Price": 26780.0,
     "NAV": 26701.0,
@@ -8,9 +10,11 @@
     "P/E": 26.972824,
     "P/B": null,
     "Yield %": 1.24,
-    "Fetched At": "2026-02-05 23:54:37"
+    "Fetched At": "2026-02-05 23:56:20"
   },
   {
+    "Index Name": "MSCI ACWI ex Japanインデックス",
+    "ETF Name": "上場インデックスファンド世界株式(MSCI ACWI)除く日本",
     "Ticker": "1554.T",
     "Price": 6109.0,
     "NAV": 6087.14,
@@ -19,9 +23,11 @@
     "P/E": 26.009928,
     "P/B": null,
     "Yield %": 1.09,
-    "Fetched At": "2026-02-05 23:54:38"
+    "Fetched At": "2026-02-05 23:56:20"
   },
   {
+    "Index Name": "MSCI-KOKUSAIインデックス",
+    "ETF Name": "上場インデックスファンド海外先進国株式(MSCI-KOKUSAI)",
     "Ticker": "1680.T",
     "Price": 7485.0,
     "NAV": 7514.57,
@@ -30,9 +36,11 @@
     "P/E": 27.258492,
     "P/B": null,
     "Yield %": 1.01,
-    "Fetched At": "2026-02-05 23:54:38"
+    "Fetched At": "2026-02-05 23:56:20"
   },
   {
+    "Index Name": "MSCI-KOKUSAIインデックス",
+    "ETF Name": "MAXIS 海外株式 (MSCIコクサイ)上場投信",
     "Ticker": "1550.T",
     "Price": 7329.0,
     "NAV": 7322.32,
@@ -41,9 +49,11 @@
     "P/E": 28.924658,
     "P/B": null,
     "Yield %": 1.09,
-    "Fetched At": "2026-02-05 23:54:38"
+    "Fetched At": "2026-02-05 23:56:20"
   },
   {
+    "Index Name": "MSCI-KOKUSAIインデックス",
+    "ETF Name": "NEXT FUNDS外国株式・MSCI-KOKUSAI指数(為替ヘッジなし) 連動型上場投信",
     "Ticker": "2513.T",
     "Price": 3243.0,
     "NAV": 3238.37,
@@ -52,9 +62,11 @@
     "P/E": 3.1787434,
     "P/B": null,
     "Yield %": 1.06,
-    "Fetched At": "2026-02-05 23:54:38"
+    "Fetched At": "2026-02-05 23:56:21"
   },
   {
+    "Index Name": "MSCI-KOKUSAI指数(円ペース・為替ヘッジあり)",
+    "ETF Name": "NEXT FUNDS外国株式・MSCI-KOKUSAI指数(為替ヘッジあり)連動型上場投信",
     "Ticker": "2514.T",
     "Price": 1885.0,
     "NAV": 1894.08,
@@ -63,9 +75,11 @@
     "P/E": 3.2164268,
     "P/B": null,
     "Yield %": 1.15,
-    "Fetched At": "2026-02-05 23:54:39"
+    "Fetched At": "2026-02-05 23:56:21"
   },
   {
+    "Index Name": "MSCI コクサイ指数(税引後配当込み、国内投信用、円建て)",
+    "ETF Name": "シェアーズ・コア MSCI 先進国株(除く日本)ETF",
     "Ticker": "1657.T",
     "Price": 6601.0,
     "NAV": 6601.99,
@@ -74,9 +88,11 @@
     "P/E": 25.069645,
     "P/B": null,
     "Yield %": 0.98,
-    "Fetched At": "2026-02-05 23:54:39"
+    "Fetched At": "2026-02-05 23:56:21"
   },
   {
+    "Index Name": "MSCI エマージング・マーケット・インデックス",
+    "ETF Name": "上場インデックスファンド海外新興国株式 (MSCIエマージング)",
     "Ticker": "1681.T",
     "Price": 2957.0,
     "NAV": 2898.16,
@@ -85,9 +101,11 @@
     "P/E": 20.913382,
     "P/B": null,
     "Yield %": 1.66,
-    "Fetched At": "2026-02-05 23:54:39"
+    "Fetched At": "2026-02-05 23:56:21"
   },
   {
+    "Index Name": "MSCI エマージング・マーケット・インデックス",
+    "ETF Name": "NEXT FUNDS新興国株式・MSCIエマージング・マーケット・インデックス(為替ヘッジなし) 連動型上場投信",
     "Ticker": "2520.T",
     "Price": 2098.0,
     "NAV": 2033.74,
@@ -96,9 +114,11 @@
     "P/E": 17.39856,
     "P/B": null,
     "Yield %": 1.7399999999999998,
-    "Fetched At": "2026-02-05 23:54:39"
+    "Fetched At": "2026-02-05 23:56:22"
   },
   {
+    "Index Name": "MSCI エマージング・マーケッツ IMI指数(税引後配当込み、国内投信用、円建て)",
+    "ETF Name": "シェアーズ・コアMSCI 新興国株 ETF",
     "Ticker": "1658.T",
     "Price": 3923.0,
     "NAV": 3863.08,
@@ -107,9 +127,11 @@
     "P/E": 16.813534,
     "P/B": null,
     "Yield %": 2.0599999,
-    "Fetched At": "2026-02-05 23:54:40"
+    "Fetched At": "2026-02-05 23:56:22"
   },
   {
+    "Index Name": "MSCI サウジアラビア・インデックス(円換算ベース)",
+    "ETF Name": "SBI サウジアラビア株式上場投信",
     "Ticker": "273A.T",
     "Price": 10120.0,
     "NAV": 10013.0,
@@ -118,9 +140,11 @@
     "P/E": null,
     "P/B": null,
     "Yield %": 3.2899998,
-    "Fetched At": "2026-02-05 23:54:40"
+    "Fetched At": "2026-02-05 23:56:22"
   },
   {
+    "Index Name": "MSCI 日本株最小分散指数(配当込み)",
+    "ETF Name": "シェアーズ MSCI 日本株最小分散 ETF",
     "Ticker": "1477.T",
     "Price": 3156.0,
     "NAV": 3151.81,
@@ -129,9 +153,11 @@
     "P/E": 17.720013,
     "P/B": null,
     "Yield %": 1.66,
-    "Fetched At": "2026-02-05 23:54:40"
+    "Fetched At": "2026-02-05 23:56:22"
   },
   {
+    "Index Name": "MSCI ジャパン高配当利回り指数(配当込み)",
+    "ETF Name": "シェアーズ MSCI ジャパン高配当利回り ETF",
     "Ticker": "1478.T",
     "Price": 4977.0,
     "NAV": 4902.0,
@@ -140,9 +166,11 @@
     "P/E": 14.322734,
     "P/B": null,
     "Yield %": 2.25,
-    "Fetched At": "2026-02-05 23:54:40"
+    "Fetched At": "2026-02-05 23:56:23"
   },
   {
+    "Index Name": "MSCIジャパンIMIカスタム高流動性高利回り低ボラティリティ指数",
+    "ETF Name": "上場インデックスファンドMSCI日本株高配当低ボラティリティ",
     "Ticker": "1399.T",
     "Price": 2911.0,
     "NAV": 2861.36,
@@ -151,9 +179,11 @@
     "P/E": 14.279159,
     "P/B": null,
     "Yield %": 2.6099999,
-    "Fetched At": "2026-02-05 23:54:41"
+    "Fetched At": "2026-02-05 23:56:23"
   },
   {
+    "Index Name": "MSCI日本株人材設備投資指数(配当込み)",
+    "ETF Name": "iFreeETF MSCI日本株人材設備投資指数",
     "Ticker": "1479.T",
     "Price": 45960.0,
     "NAV": 48117.1,
@@ -162,9 +192,11 @@
     "P/E": 20.641008,
     "P/B": null,
     "Yield %": 1.53,
-    "Fetched At": "2026-02-05 23:54:41"
+    "Fetched At": "2026-02-05 23:56:23"
   },
   {
+    "Index Name": "MSCI日本株女性活躍指数(配当込み)",
+    "ETF Name": "iFreeETF MSCI日本株女性活躍指数(WIN)",
     "Ticker": "1652.T",
     "Price": 4309.0,
     "NAV": 4322.37,
@@ -173,9 +205,11 @@
     "P/E": 17.328947,
     "P/B": null,
     "Yield %": 1.6500000000000001,
-    "Fetched At": "2026-02-05 23:54:41"
+    "Fetched At": "2026-02-05 23:56:23"
   },
   {
+    "Index Name": "MSCI 日本株女性活躍指数(セレクト) (配当込み)",
+    "ETF Name": "NEXT FUNDS MSCI日本株女性活躍指数(セレクト)連動型上場投信",
     "Ticker": "2518.T",
     "Price": 2086.0,
     "NAV": 2087.04,
@@ -184,9 +218,11 @@
     "P/E": 17.698143,
     "P/B": null,
     "Yield %": 1.96,
-    "Fetched At": "2026-02-05 23:54:41"
+    "Fetched At": "2026-02-05 23:56:24"
   },
   {
+    "Index Name": "MSCIジャパンESGセレクト・リーダーズ指数(配当込み)",
+    "ETF Name": "iFreeETF MSCIジャパンESGセレクト・リーダーズ指数",
     "Ticker": "1653.T",
     "Price": 4720.0,
     "NAV": 4719.62,
@@ -195,9 +231,11 @@
     "P/E": 16.91719,
     "P/B": null,
     "Yield %": 1.6099999999999999,
-    "Fetched At": "2026-02-05 23:54:42"
+    "Fetched At": "2026-02-05 23:56:24"
   },
   {
+    "Index Name": "MSCI ジャパン・高配当セレクト25指数(配当込み)",
+    "ETF Name": "グローバルX MSCIスーパーディビィデンドー日本株式 ETF",
     "Ticker": "2564.T",
     "Price": 3561.0,
     "NAV": 3559.67,
@@ -206,9 +244,11 @@
     "P/E": 14.757975,
     "P/B": null,
     "Yield %": 3.95,
-    "Fetched At": "2026-02-05 23:54:42"
+    "Fetched At": "2026-02-05 23:56:24"
   },
   {
+    "Index Name": "MSCI Japan Governance-Quality Index (配当込み)",
+    "ETF Name": "グローバルX MSCI ガバナンス・クオリティー日本株式 ETF",
     "Ticker": "2636.T",
     "Price": 4307.0,
     "NAV": 4353.63,
@@ -217,9 +257,11 @@
     "P/E": 22.026299,
     "P/B": null,
     "Yield %": 0.9400000000000001,
-    "Fetched At": "2026-02-05 23:54:42"
+    "Fetched At": "2026-02-05 23:56:24"
   },
   {
+    "Index Name": "MSCI ジャパンカントリー指数(セレクト) (配当込み)",
+    "ETF Name": "NEXT FUNDS MSCIジャパンカントリー指数(セレクト) 連動型上場投信",
     "Ticker": "2643.T",
     "Price": 3800.0,
     "NAV": 3818.4,
@@ -228,9 +270,11 @@
     "P/E": 18.912016,
     "P/B": null,
     "Yield %": 1.72,
-    "Fetched At": "2026-02-05 23:54:42"
+    "Fetched At": "2026-02-05 23:56:25"
   },
   {
+    "Index Name": "MSCI Japan Climate Change Index (配当込み)",
+    "ETF Name": "グローバルX MSCI 気候変動対応-日本株式ETF",
     "Ticker": "2848.T",
     "Price": 2750.0,
     "NAV": 2743.19,
@@ -239,9 +283,11 @@
     "P/E": 19.430521,
     "P/B": null,
     "Yield %": 0.8099999999999999,
-    "Fetched At": "2026-02-05 23:54:43"
+    "Fetched At": "2026-02-05 23:56:25"
   },
   {
+    "Index Name": "MSCIジャパン 700 SRIセレクト指数(配当込み)",
+    "ETF Name": "シェアーズ MSCI ジャパンSRI ETF",
     "Ticker": "2851.T",
     "Price": 344.7,
     "NAV": 349.301,
@@ -250,9 +296,11 @@
     "P/E": 20.46255,
     "P/B": null,
     "Yield %": 1.5800001000000001,
-    "Fetched At": "2026-02-05 23:54:43"
+    "Fetched At": "2026-02-05 23:56:25"
   },
   {
+    "Index Name": "MSCIジャパン気候変動アクション指数(配当込み)",
+    "ETF Name": "シェアーズ MSCI ジャパン気候変動アクション ETF",
     "Ticker": "2250.T",
     "Price": 328.6,
     "NAV": 328.523,
@@ -261,9 +309,11 @@
     "P/E": 17.153437,
     "P/B": null,
     "Yield %": 1.68,
-    "Fetched At": "2026-02-05 23:54:43"
+    "Fetched At": "2026-02-05 23:56:26"
   },
   {
+    "Index Name": "MSCIジャパン気候変動指数(セレクト) (配当込み)",
+    "ETF Name": "NEXT FUNDS MSCIジャパン気候変動指数(セレクト)連動型上場投信",
     "Ticker": "294A.T",
     "Price": 2633.0,
     "NAV": 2648.21,
@@ -272,9 +322,11 @@
     "P/E": 19.097975,
     "P/B": null,
     "Yield %": 0.4,
-    "Fetched At": "2026-02-05 23:54:44"
+    "Fetched At": "2026-02-05 23:56:26"
   },
   {
+    "Index Name": "MSCI Japan IMI High Free Cash Flow Yield 50 Select Index (配当込み)",
+    "ETF Name": "グローバルX MSCI キャッシュフローキングー日本株式ETF",
     "Ticker": "234A.T",
     "Price": 1426.0,
     "NAV": 1398.24,
@@ -283,9 +335,11 @@
     "P/E": 14.638107,
     "P/B": null,
     "Yield %": 2.0499999,
-    "Fetched At": "2026-02-05 23:54:44"
+    "Fetched At": "2026-02-05 23:56:26"
   },
   {
+    "Index Name": "MSCIジャパンIMIカスタムロングショート戦略85%+円キャッシュ 15%指数",
+    "ETF Name": "上場インデックスファンドMSCI日本株高配当低ボラティリティ (Bヘッジ)",
     "Ticker": "1490.T",
     "Price": 7350.0,
     "NAV": 7676.0,
@@ -294,6 +348,6 @@
     "P/E": 13.538274,
     "P/B": null,
     "Yield %": 2.4300002000000003,
-    "Fetched At": "2026-02-05 23:54:44"
+    "Fetched At": "2026-02-05 23:56:27"
   }
 ]

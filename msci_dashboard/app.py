@@ -277,18 +277,47 @@ def main():
     st.title("MSCI ETF Dashboard Ver.1")
     
     # Verification Timestamp
-    try:
-        # Check one liquid ticker for timing
-        ref_ticker = "2559.T" 
-        ref_info = yf.Ticker(ref_ticker).info
-        ts = ref_info.get('regularMarketTime')
-        if ts:
-            last_dt = datetime.fromtimestamp(ts)
-            st.caption(f"Data as of: {last_dt.strftime('%Y-%m-%d %H:%M:%S')}")
-    except:
+    if not df_prices.empty:
+        last_dt = df_prices.index[-1]
+        st.caption(f"Data as of: {last_dt.strftime('%Y-%m-%d')}")
+    else:
         st.caption("Data as of: Unknown")
 
     st.caption("Tracking JPX-Listed MSCI ETFs")
+
+    # ... (skipping lines) ...
+    
+    # 5. Detailed Table
+    st.subheader("Performance and valuations (%)")
+    
+    # Base Data: Performance
+    df_display = df_perf.copy()
+    
+    # Add Metadata (Name/Index) which we have locally
+    df_display["Index Name"] = df_display.index.map(lambda t: ETF_METADATA.get(t, {}).get("Index", ""))
+    df_display["ETF Name"] = df_display.index.map(lambda t: ETF_METADATA.get(t, {}).get("Name", ""))
+    
+    cols_perf = ['1D', '1W', '1M', '3M', 'MTD', 'QTD', 'YTD', '1Yr', '3Yr']
+    cols_nav = ['Price', 'NAV', 'Premium %', 'AUM (B)'] # May be missing
+    cols_fund = ['P/B', 'P/E', 'Yield %'] # May be missing
+    cols_meta = ['Index Name', 'ETF Name'] # Index is index
+    
+    if not df_fund.empty:
+        # Merge if we have fundamentals
+        df_display = df_fund.merge(df_perf, left_on="Index Name", right_index=True, how="left")
+    else:
+         # If fundamentals missing, fill with NaN
+         st.warning("⚠️ Live fundamental data (NAV, P/E, AUM) temporarily unavailable from Yahoo Finance. Showing Performance only.")
+         for c in cols_nav + cols_fund:
+             df_display[c] = pd.NA
+         # Reset index to get Ticker as column if needed, or just standard merge preparation
+         df_display["Ticker"] = df_display.index 
+    
+    # Organize Columns
+    final_cols = ['Index Name', 'ETF Name', 'Ticker'] + cols_perf + cols_nav + cols_fund
+    final_cols = [c for c in final_cols if c in df_display.columns]
+
+    # ... (formatting) ...
 
     # 1. Fetch Data
     status_text = st.empty()

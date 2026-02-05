@@ -4,3 +4,4 @@ yfinance
 tabulate
 streamlit
 matplotlib
+lxml

@@ -373,56 +373,61 @@ def main():
     # Base Data: Performance
     df_display = df_perf.copy()
     
+    cols_perf = ['1D', '1W', '1M', '3M', 'MTD', 'QTD', 'YTD', '1Yr', '3Yr']
+    cols_nav = ['Price', 'NAV', 'Premium %', 'AUM (B)']
+    cols_fund = ['P/B', 'P/E', 'Yield %']
+    cols_meta = ['Index Name', 'ETF Name', 'Ticker']
+    final_cols_order = cols_meta + cols_perf + cols_nav + cols_fund 
+
     if not df_fund.empty:
         # Merge Performance with Fundamentals
-        # Merge on "Index Name" but keep "Ticker" unique
         df_final = df_fund.merge(df_perf, left_on="Index Name", right_index=True, how="left")
-        
-        # Columns Order matching request
-        # Name | 1D 1W 1M 3M MTD QTD YTD 1Yr 3Yr | Price NAV Premium AUM | PB PE DY
-        cols_perf = ['1D', '1W', '1M', '3M', 'MTD', 'QTD', 'YTD', '1Yr', '3Yr']
-        cols_nav = ['Price', 'NAV', 'Premium %', 'AUM (B)']
-        cols_fund = ['P/B', 'P/E', 'Yield %']
-        cols_meta = ['Index Name', 'ETF Name', 'Ticker']
-        
-        final_cols = cols_meta + cols_perf + cols_nav + cols_fund 
-
-        
-        # Filter only existing columns
-        final_cols = [c for c in final_cols if c in df_final.columns]
-        
-        # Safe formatter
-        def safe_fmt(fmt):
-            return lambda x: fmt.format(x) if pd.notnull(x) and x is not None else ""
-            
-        def fmt_aum(x):
-            if pd.notnull(x) and x is not None:
-                return f"{x/1_000_000_000:,.1f}B" # Billions
-            return ""
-
-        format_dict = {c: safe_fmt("{:+.1f}") for c in cols_perf}
-        format_dict.update({
-            'Price': safe_fmt("{:,.0f}"),
-            'NAV': safe_fmt("{:,.0f}"),
-            'Premium %': safe_fmt("{:+.2f}"),
-            'AUM (B)': fmt_aum,
-            'P/B': safe_fmt("{:.1f}"),
-            'P/E': safe_fmt("{:.1f}"),
-            'Yield %': safe_fmt("{:.1f}"),
-            'ETF Name': lambda x: x # String
-        })
-
-        st.dataframe(
-            df_final[final_cols].style
-            .format(format_dict)
-            .background_gradient(subset=['YTD'], cmap="ocean_r", vmin=-20, vmax=40) # Highlight YTD like the image
-            .set_properties(**{'white-space': 'wrap'}, subset=['Index Name', 'ETF Name']), # Wrap long names
-            use_container_width=True,
-            height=800,
-            hide_index=True
-        )
     else:
-        st.warning("Fundamental data could not be retrieved.")
+        st.warning("⚠️ Live fundamental data (NAV, P/E, AUM) temporarily unavailable. Showing Performance only.")
+        df_final = df_perf.copy()
+        df_final["Ticker"] = df_final.index
+        df_final["Index Name"] = df_final.index.map(lambda t: ETF_METADATA.get(t, {}).get("Index", ""))
+        df_final["ETF Name"] = df_final.index.map(lambda t: ETF_METADATA.get(t, {}).get("Name", ""))
+        
+        for c in cols_nav + cols_fund:
+             df_final[c] = pd.NA
+
+    # Filter only existing columns
+    final_cols = [c for c in final_cols_order if c in df_final.columns]
+    
+    # Safe formatter
+    def safe_fmt(fmt):
+        return lambda x: fmt.format(x) if pd.notnull(x) and x is not None and x is not pd.NA else ""
+        
+    def fmt_aum(x):
+        if pd.notnull(x) and x is not None and x is not pd.NA:
+            try:
+                return f"{float(x)/1_000_000_000:,.1f}B" # Billions
+            except:
+                return ""
+        return ""
+
+    format_dict = {c: safe_fmt("{:+.1f}") for c in cols_perf}
+    format_dict.update({
+        'Price': safe_fmt("{:,.0f}"),
+        'NAV': safe_fmt("{:,.0f}"),
+        'Premium %': safe_fmt("{:+.2f}"),
+        'AUM (B)': fmt_aum,
+        'P/B': safe_fmt("{:.1f}"),
+        'P/E': safe_fmt("{:.1f}"),
+        'Yield %': safe_fmt("{:.1f}"),
+        'ETF Name': lambda x: x # String
+    })
+
+    st.dataframe(
+        df_final[final_cols].style
+        .format(format_dict)
+        .background_gradient(subset=['YTD'], cmap="ocean_r", vmin=-20, vmax=40) 
+        .set_properties(**{'white-space': 'wrap'}, subset=['Index Name', 'ETF Name']),
+        use_container_width=True,
+        height=800,
+        hide_index=True
+    )
 
     # 3. Chart (Optional, kept at bottom)
     with st.expander("Show Price Chart"):

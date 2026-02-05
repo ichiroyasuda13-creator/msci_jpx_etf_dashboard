@@ -157,12 +157,15 @@ def get_fundamentals():
     
     # Locate json in the same directory as app.py
     snapshot_path = os.path.join(os.path.dirname(__file__), 'etf_snapshot.json')
-    
     if os.path.exists(snapshot_path):
         try:
             with open(snapshot_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                return pd.DataFrame(data).set_index("Ticker", drop=False)
+                df = pd.DataFrame(data)
+                # Ensure Metadata Columns exist (Critical for Merge)
+                df["Index Name"] = df["Ticker"].map(lambda t: ETF_METADATA.get(t, {}).get("Index", ""))
+                df["ETF Name"] = df["Ticker"].map(lambda t: ETF_METADATA.get(t, {}).get("Name", ""))
+                return df.set_index("Ticker", drop=False)
         except:
             pass
             
@@ -398,6 +401,10 @@ def main():
     final_cols_order = cols_meta + cols_perf + cols_nav + cols_fund 
 
     if not df_fund.empty:
+        # DEBUG: Check columns
+        # st.write("Fund Columns:", df_fund.columns.tolist())
+        # st.write("Perf Index:", df_perf.index.name)
+        
         # Merge Performance with Fundamentals
         df_final = df_fund.merge(df_perf, left_on="Index Name", right_index=True, how="left")
     else:

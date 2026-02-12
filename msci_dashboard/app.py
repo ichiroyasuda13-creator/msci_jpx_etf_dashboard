@@ -653,12 +653,34 @@ def main():
         
         if selected_etfs_price:
             # Filter
-            df_price_sliced = filter_by_timeframe(df_prices[selected_etfs_price], price_tf)
+            if price_tf == "1D":
+                 with st.spinner("Fetching intraday..."):
+                     df_intraday = fetch_intraday_data(selected_etfs_price)
+                 if not df_intraday.empty:
+                     df_price_sliced = df_intraday
+                 else:
+                     df_price_sliced = filter_by_timeframe(df_prices[selected_etfs_price], price_tf)
+            else:
+                 df_price_sliced = filter_by_timeframe(df_prices[selected_etfs_price], price_tf)
             
             if normalize and not df_price_sliced.empty:
-                 df_price_sliced = (df_price_sliced / df_price_sliced.iloc[0] - 1) * 100
-                 
-            st.line_chart(df_price_sliced)
+                 # Use bfill().iloc[0] for robustness against start-of-day NaNs
+                 first_valid = df_price_sliced.bfill().iloc[0]
+                 df_price_sliced = (df_price_sliced / first_valid - 1) * 100
+            
+            # Rename columns to ETF Name for Legend
+            if not df_price_sliced.empty:
+                # Create renaming dict: Ticker -> ETF Name
+                rename_dict = {}
+                for col in df_price_sliced.columns:
+                     meta = ETF_METADATA.get(col, {})
+                     name = meta.get('Name', col)
+                     rename_dict[col] = f"{name} ({col})"
+                
+                df_chart = df_price_sliced.rename(columns=rename_dict)
+                st.line_chart(df_chart)
+            else:
+                st.info("No data available for selected range.")
 
 
 if __name__ == '__main__':

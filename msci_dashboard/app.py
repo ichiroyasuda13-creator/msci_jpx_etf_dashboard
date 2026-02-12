@@ -159,6 +159,45 @@ def fetch_data():
         return pd.DataFrame()
 
 
+@st.cache_data(ttl=300) # shorter cache for intraday
+def fetch_intraday_data(tickers):
+    """Fetches 1D intraday data (5m interval) for selected tickers."""
+    if not tickers:
+        return pd.DataFrame()
+        
+    try:
+        # Download in one go (small enough usually) or batch if needed
+        # For 1D intraday, yfinance is usually fast.
+        df    = yf.download(tickers, period="1d", interval="5m", progress=False, threads=True)
+        
+        if df.empty:
+            return pd.DataFrame()
+            
+        # Extract Close
+        if isinstance(df.columns, pd.MultiIndex):
+            if 'Close' in df.columns.get_level_values(0):
+                 df_close = df['Close']
+            else:
+                 df_close = df.xs('Close', axis=1, level=1, drop_level=True)
+        else:
+            if 'Close' in df.columns:
+                 df_close = df['Close']
+            else:
+                 df_close = df
+                 
+        # Rename
+        ticker_to_index = {v: k for k, v in MSCI_TICKERS.items() if v in tickers}
+        df_close.rename(columns=ticker_to_index, inplace=True)
+        
+        # Clean
+        df_close.index = df_close.index.tz_localize(None)
+        df_close.ffill(inplace=True)
+        
+        return df_close
+    except Exception as e:
+        st.error(f"Intraday Fetch Error: {e}")
+        return pd.DataFrame()
+
 @st.cache_data
 def get_fundamentals():
     """Fetches fundamental data (Snapshot fallback for Cloud)."""
@@ -378,7 +417,26 @@ def main():
         selected_tf = st.radio("Time Frame", time_frames, horizontal=True, label_visibility="collapsed")
 
     # Filter Data based on Time Frame
-    df_sliced = filter_by_timeframe(df_prices, selected_tf)
+    if selected_tf == "1D":
+        # Special Case: Fetch Intraday
+        # Only fetch for relevant tickers (to save time) that are in valid_indices?
+        # Actually for simplicity, let's fetch for all valid categories to allow comparison.
+        # But we need Tickers, not Index Names.
+        
+        # 1. Map current df columns (Index Names) back to Tickers
+        # OR just use valid_tickers list we created earlier
+        
+        intraday_tickers = valid_tickers
+        with st.spinner("Fetching intraday data..."):
+             df_intraday = fetch_intraday_data(intraday_tickers)
+        
+        if not df_intraday.empty:
+            df_sliced = df_intraday
+        else:
+             # Fallback
+             df_sliced = filter_by_timeframe(df_prices, selected_tf)
+    else:
+        df_sliced = filter_by_timeframe(df_prices, selected_tf)
     
     # Rebase to 0%
     if not df_sliced.empty:

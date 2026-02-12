@@ -104,28 +104,45 @@ def fetch_data():
     tickers_list = list(MSCI_TICKERS.values())
     
     try:
-        # Download - threads=True for speed on Cloud (Linux)
-        df_all = yf.download(tickers_list, start=start_date, progress=False, threads=True)
-
-        if df_all.empty:
+        # optimize: Download in batches to avoid Timeouts/Memory issues on Cloud
+        chunk_size = 5
+        dfs = []
+        
+        # Progress bar
+        progress_bar = st.progress(0)
+        
+        for i in range(0, len(tickers_list), chunk_size):
+            batch = tickers_list[i:i + chunk_size]
+            try:
+                # Download batch
+                df_batch = yf.download(batch, start=start_date, progress=False, threads=False) # threads=False is surprisingly safer for small batches on cloud
+                
+                if not df_batch.empty:
+                    # Isolate Close column for this batch
+                    if isinstance(df_batch.columns, pd.MultiIndex):
+                        if 'Close' in df_batch.columns.get_level_values(0):
+                             dfs.append(df_batch['Close'])
+                        else:
+                             dfs.append(df_batch.xs('Close', axis=1, level=1, drop_level=True))
+                    else:
+                        if 'Close' in df_batch.columns:
+                             dfs.append(df_batch['Close'])
+                        else:
+                             dfs.append(df_batch)
+            except Exception as e:
+                print(f"Error fetching batch {batch}: {e}")
+            
+            # Update progress
+            progress_bar.progress(min((i + chunk_size) / len(tickers_list), 1.0))
+            
+        progress_bar.empty()
+        
+        if not dfs:
             st.error("Download returned empty dataframe.")
             return pd.DataFrame()
 
-        # Handle MultiIndex logic safely
-        if isinstance(df_all.columns, pd.MultiIndex):
-            # Try to get Close column
-            if 'Close' in df_all.columns.get_level_values(0):
-                 df_close = df_all['Close']
-            else:
-                 # Fallback if structure is different
-                 df_close = df_all.xs('Close', axis=1, level=1, drop_level=True)
-        else:
-            # Simple index
-            if 'Close' in df_all.columns:
-                 df_close = df_all['Close']
-            else:
-                 # Maybe it IS the close data?
-                 df_close = df_all
+        # Combine batches
+        df_close = pd.concat(dfs, axis=1)
 
         # Rename
         ticker_to_index = {v: k for k, v in MSCI_TICKERS.items()}
@@ -133,7 +150,7 @@ def fetch_data():
         
         # Clean
         df_close.index = df_close.index.tz_localize(None)
-        df_close.fillna(method='ffill', inplace=True)
+        df_close.ffill(inplace=True) # Updated from method='ffill'
         
         return df_close
         

@@ -678,6 +678,10 @@ def main():
             
             # Rename columns to ETF Name for Legend
             if not df_price_sliced.empty:
+                # DEBUG:
+                st.write("Columns:", df_price_sliced.columns.tolist())
+                st.write("Head:", df_price_sliced.head())
+
                 # Create renaming dict: Ticker -> ETF Name
                 rename_dict = {}
                 for col in df_price_sliced.columns:

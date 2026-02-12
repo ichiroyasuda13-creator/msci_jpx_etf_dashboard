@@ -291,7 +291,7 @@ def main():
     # DEBUG CHECKPOINT
     # st.write("Initializing Dashboard...")
     
-    st.title("MSCI ETF Dashboard Ver.1")
+    st.title("MSCI ETF Dashboard Ver.2")
     
     # Verification Timestamp (moved later)
 

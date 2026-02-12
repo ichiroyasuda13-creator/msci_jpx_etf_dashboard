@@ -82,15 +82,19 @@ ETF_METADATA = {
 }
 
 # Invert for data fetching logic
-MSCI_TICKERS = {meta["Index"]: ticker for ticker, meta in ETF_METADATA.items()}
+# PROBLEM: Index Names are NOT unique. We must use a list of tickers or map Ticker -> Index.
+# We already have ETF_METADATA which is Ticker -> Meta.
+# Let's just use ETF_METADATA.keys() for fetching.
+
+MSCI_TICKERS_LIST = list(ETF_METADATA.keys())
+
+# CATEGORIES mapping (Category -> [Tickers])
 CATEGORIES = {}
 for ticker, meta in ETF_METADATA.items():
     cat = meta["Category"]
     if cat not in CATEGORIES:
         CATEGORIES[cat] = []
-    CATEGORIES[cat].append(meta["Index"])
-
-# --- DATA FETCHING ---
+    CATEGORIES[cat].append(ticker) # Store Ticker, not Index Name
 
 # --- DATA FETCHING ---
 
@@ -100,8 +104,7 @@ def fetch_data():
     # 3 years + buffer (User Request)
     start_date = datetime.now() - timedelta(days=365*3 + 30)
     
-    # Full list
-    tickers_list = list(MSCI_TICKERS.values())
+    tickers_list = MSCI_TICKERS_LIST
     
     try:
         # optimize: Download in batches to avoid Timeouts/Memory issues on Cloud
@@ -120,6 +123,8 @@ def fetch_data():
                 if not df_batch.empty:
                     # Isolate Close column for this batch
                     if isinstance(df_batch.columns, pd.MultiIndex):
+                        # yfinance structure: (Price, Ticker)
+                        # We want Close price for each ticker
                         if 'Close' in df_batch.columns.get_level_values(0):
                              dfs.append(df_batch['Close'])
                         else:
@@ -144,13 +149,13 @@ def fetch_data():
         # Combine batches
         df_close = pd.concat(dfs, axis=1)
 
-        # Rename
-        ticker_to_index = {v: k for k, v in MSCI_TICKERS.items()}
-        df_close.rename(columns=ticker_to_index, inplace=True)
-        
         # Clean
         df_close.index = df_close.index.tz_localize(None)
-        df_close.ffill(inplace=True) # Updated from method='ffill'
+        df_close.ffill(inplace=True)
+        
+        # Ensure columns are Tickers (yfinance usually does this, but let's be sure)
+        # If we had single ticker batch, it might not have ticker name as column
+        # Batch download normally returns dataframe with columns = Tickers
         
         return df_close
         
@@ -423,13 +428,15 @@ def main():
     )
     
     # Filter Tickers based on Category
+    
+    # Filter Tickers based on Category
     valid_tickers = [t for t, m in ETF_METADATA.items() if m["Category"] in selected_categories]
-    valid_indices = [ETF_METADATA[t]["Index"] for t in valid_tickers if t in ETF_METADATA]
+    # valid_indices is no longer needed for filtering df_prices, as df_prices now uses Tickers
     
     # Filter Dataframes
     if not df_prices.empty:
-        # Keep only columns that are in valid_indices
-        cols_to_keep = [c for c in df_prices.columns if c in valid_indices]
+        # Keep only columns that are in valid_tickers
+        cols_to_keep = [c for c in df_prices.columns if c in valid_tickers]
         df_prices = df_prices[cols_to_keep]
 
     if not df_fund.empty:
@@ -460,13 +467,6 @@ def main():
     # Filter Data based on Time Frame
     if selected_tf == "1D":
         # Special Case: Fetch Intraday
-        # Only fetch for relevant tickers (to save time) that are in valid_indices?
-        # Actually for simplicity, let's fetch for all valid categories to allow comparison.
-        # But we need Tickers, not Index Names.
-        
-        # 1. Map current df columns (Index Names) back to Tickers
-        # OR just use valid_tickers list we created earlier
-        
         intraday_tickers = valid_tickers
         with st.spinner("Fetching intraday data..."):
              df_intraday = fetch_intraday_data(intraday_tickers)
@@ -490,33 +490,56 @@ def main():
     
     # User selection for highlight
     multiselect_container = st.container()
-    all_options = list(df_normalized.columns)
+    all_tickers = list(df_normalized.columns)
+    
+    # Helper to get display name for ticker
+    def get_display_name(ticker):
+        meta = ETF_METADATA.get(ticker, {})
+        return f"{meta.get('Index', ticker)} ({ticker})"
+
+    # Create mapping for multiselect
+    # Ticker -> Display Name
+    # But multiselect returns values. 
+    # Let's simple use Tickers as options but format them? 
+    # OR use Display Names and map back.
+    # Simpler: Use Tickers as keys, format_func for display
     
     # Defaults (Adjust based on filter)
-    # Only keep defaults if they are in the filtered list
-    default_candidates = ["MSCI ACWI", "MSCI Japan High Div", "MSCI EM"]
-    defaults = [x for x in default_candidates if x in all_options]
+    # default_candidates = ["MSCI ACWI", "MSCI Japan High Div", "MSCI EM"] # These are Index Names.
+    # We need Tickers now.
+    default_candidates_tickers = ["2559.T", "1478.T", "1681.T"] # Update to Tickers
     
-    # If no defaults remain (e.g. filtered out), pick the first one
-    if not defaults and all_options:
-        defaults = [all_options[0]]
+    defaults = [x for x in default_candidates_tickers if x in all_tickers]
+    
+    if not defaults and all_tickers:
+        defaults = [all_tickers[0]]
     
     with multiselect_container:
-        selected_indices = st.multiselect("Compare Indices:", all_options, default=defaults)
+        selected_tickers_chart = st.multiselect(
+            "Compare Indices:", 
+            all_tickers, 
+            default=defaults,
+            format_func=get_display_name
+        )
 
-    if selected_indices:
+    if selected_tickers_chart:
         fig = go.Figure()
-        for col in selected_indices:
-            # Find matching metadata for tooltips
-            ticker = MSCI_TICKERS.get(col, "")
-            etf_name = ETF_METADATA.get(ticker, {}).get("Name", "")
+        for col in selected_tickers_chart:
+            # col is Ticker
+            ticker = col
+            meta = ETF_METADATA.get(ticker, {})
+            index_name = meta.get("Index", "")
+            etf_name = meta.get("Name", "")
             
+            # Use Index Name for Legend to keep it clean
+            legend_name = index_name if index_name else ticker
+
             fig.add_trace(go.Scatter(
                 x=df_normalized.index, 
                 y=df_normalized[col], 
                 mode='lines', 
-                name=col,
-                hovertemplate=f"<b>{col}</b><br>{etf_name}<br>%{{y:.2f}}%<extra></extra>"
+                name=legend_name,
+                hovertemplate=f"<b>{legend_name}</b><br>{etf_name} ({ticker})<br>%{{y:.2f}}%<extra></extra>"
             ))
         
         fig.update_layout(
@@ -532,12 +555,12 @@ def main():
 
     # Calculate All Returns (using full history for table correctness)
     df_perf = calculate_returns(df_prices)
+    # df_perf index is now Tickers (from my previous fix + fetch_data fix)
 
     # 5. Detailed Table
     st.subheader("Performance and valuations (%)")
     
     # Base Data: Performance
-    df_display = df_perf.copy()
     
     cols_perf = ['1D', '1W', '1M', '3M', 'MTD', 'QTD', 'YTD', '1Yr', '3Yr']
     cols_nav = ['Price', 'NAV', 'Premium %', 'AUM (B)']
@@ -555,7 +578,8 @@ def main():
              df_fund["Category"] = df_fund["Ticker"].map(lambda t: ETF_METADATA.get(t, {}).get("Category", ""))
 
         # Merge Performance with Fundamentals
-        df_final = df_fund.merge(df_perf, left_on="Index Name", right_index=True, how="left")
+        # df_fund has "Ticker" column. df_perf index is Ticker.
+        df_final = df_fund.merge(df_perf, left_on="Ticker", right_index=True, how="left")
     else:
         st.warning("⚠️ Live fundamental data (NAV, P/E, AUM) temporarily unavailable. Showing Performance only.")
         df_final = df_perf.copy()

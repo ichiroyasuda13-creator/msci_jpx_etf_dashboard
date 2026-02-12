@@ -190,9 +190,9 @@ def fetch_intraday_data(tickers):
             else:
                  df_close = df
                  
-        # Rename
-        ticker_to_index = {v: k for k, v in MSCI_TICKERS.items() if v in tickers}
-        df_close.rename(columns=ticker_to_index, inplace=True)
+        # No Rename needed - we want Tickers as columns
+        # ticker_to_index = {v: k for k, v in MSCI_TICKERS.items() if v in tickers}
+        # df_close.rename(columns=ticker_to_index, inplace=True)
         
         # Clean
         df_close.index = df_close.index.tz_localize(None)

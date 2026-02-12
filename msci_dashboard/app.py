@@ -498,7 +498,9 @@ def main():
     # Helper to get display name for ticker
     def get_display_name(ticker):
         meta = ETF_METADATA.get(ticker, {})
-        return f"{meta.get('Index', ticker)} ({ticker})"
+        # User requested ETF Name
+        etf_name = meta.get('Name', ticker)
+        return f"{etf_name} ({ticker})"
 
     # Create mapping for multiselect
     # Ticker -> Display Name
@@ -519,7 +521,7 @@ def main():
     
     with multiselect_container:
         selected_tickers_chart = st.multiselect(
-            "Compare Indices:", 
+            "Select ETF/Index:", 
             all_tickers, 
             default=defaults,
             format_func=get_display_name

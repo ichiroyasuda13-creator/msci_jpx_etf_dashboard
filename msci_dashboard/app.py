@@ -185,11 +185,19 @@ def fetch_intraday_data(tickers):
             else:
                  df_close = df.xs('Close', axis=1, level=1, drop_level=True)
         else:
+            # Single Ticker Case
             if 'Close' in df.columns:
-                 df_close = df['Close']
+                 # Double brackets to keep as DataFrame
+                 df_close = df[['Close']]
             else:
                  df_close = df
                  
+            # Rename 'Close' to the actual Ticker
+            if len(tickers) == 1:
+                df_close.columns = [tickers[0]]
+            # If multiple tickers but flat columns (unlikely with yfinance), logic might differ
+            # but yfinance standard is MultiIndex for multiple tickers.
+
         # No Rename needed - we want Tickers as columns
         # ticker_to_index = {v: k for k, v in MSCI_TICKERS.items() if v in tickers}
         # df_close.rename(columns=ticker_to_index, inplace=True)

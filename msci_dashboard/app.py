@@ -481,7 +481,10 @@ def main():
     
     # Rebase to 0%
     if not df_sliced.empty:
-        df_normalized = (df_sliced / df_sliced.iloc[0] - 1) * 100
+        # Use bfill to get the first VALID price for each ticker, even if they start at slightly different times.
+        # This prevents the whole column from becoming NaN if iloc[0] is NaN.
+        first_valid_prices = df_sliced.bfill().iloc[0]
+        df_normalized = (df_sliced / first_valid_prices - 1) * 100
     else:
         df_normalized = df_sliced
 

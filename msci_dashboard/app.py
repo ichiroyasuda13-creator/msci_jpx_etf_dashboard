@@ -104,8 +104,8 @@ def fetch_data():
     tickers_list = list(MSCI_TICKERS.values())
     
     try:
-        # Download - SINGLE THREAD for safety on Windows
-        df_all = yf.download(tickers_list, start=start_date, progress=False, threads=False)
+        # Download - threads=True for speed on Cloud (Linux)
+        df_all = yf.download(tickers_list, start=start_date, progress=False, threads=True)
 
         if df_all.empty:
             st.error("Download returned empty dataframe.")

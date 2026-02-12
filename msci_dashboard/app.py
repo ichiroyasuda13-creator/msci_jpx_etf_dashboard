@@ -579,7 +579,9 @@ def main():
 
         # Merge Performance with Fundamentals
         # df_fund has "Ticker" column. df_perf index is Ticker.
-        df_final = df_fund.merge(df_perf, left_on="Ticker", right_index=True, how="left")
+        # df_fund ALSO has Ticker as Index (from get_fundamentals).
+        # We merge on Index to avoid "Ticker is both index and column" error.
+        df_final = df_fund.merge(df_perf, left_index=True, right_index=True, how="left")
     else:
         st.warning("⚠️ Live fundamental data (NAV, P/E, AUM) temporarily unavailable. Showing Performance only.")
         df_final = df_perf.copy()

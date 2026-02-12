@@ -252,59 +252,100 @@ def get_fundamentals():
     return pd.DataFrame(rows)
 
 def calculate_returns(df_prices):
-    """Calculates returns for all requested available timeframes."""
+    """Calculates returns for all requested available timeframes, handling data gaps robustly."""
     results = {}
     
     if df_prices.empty:
         return pd.DataFrame()
 
-    current_date = df_prices.index[-1]
-    last_prices = df_prices.iloc[-1]
+    # We need to process each column individually because tickers might have different end dates
+    # (e.g. Foreign ETFs vs Japan ETFs with different holidays)
     
-    # Helper to get price N days/months ago
-    # We use 'asof' logic by looking for the index location
-    def get_pct_change(days=None, hard_date=None):
-        if hard_date:
-            target_date = hard_date
-        else:
-            target_date = current_date - timedelta(days=days)
-        
-        # Find index of closest date on or before target
-        # Use simple masking
-        past_data = df_prices[df_prices.index <= target_date]
-        if past_data.empty:
-            return pd.Series([None]*len(df_prices.columns), index=df_prices.columns)
+    periods = {
+        '1D': 1,
+        '1W': 7,
+        '1M': 30,
+        '3M': 91,
+        '1Yr': 365,
+        '3Yr': 365*3,
+        '5Yr': 365*5
+    }
+    
+    # Pre-calculate calendar dates (base reference is today)
+    now = datetime.now()
+    # For calendar metrics (YTD, MTD), we still use a fixed reference point relative to the LATEST data available.
+    # But ideally, we should use the latest date *per ticker*.
+    
+    final_data = []
+
+    for ticker in df_prices.columns:
+        series = df_prices[ticker].dropna()
+        if series.empty:
+            continue
             
-        start_prices = past_data.iloc[-1]
-        return ((last_prices - start_prices) / start_prices) * 100
+        last_dt = series.index[-1]
+        last_price = series.iloc[-1]
+        
+        ticker_res = {}
+        ticker_res['Ticker'] = ticker # temporary key for alignment
+        
+        # 1. Rolling Periods
+        for name, days in periods.items():
+            target_dt = last_dt - timedelta(days=days)
+            # Find price on or before target
+            past_series = series[series.index <= target_dt]
+            if not past_series.empty:
+                start_price = past_series.iloc[-1]
+                ticker_res[name] = ((last_price - start_price) / start_price) * 100
+            else:
+                ticker_res[name] = None
+        
+        # 2. Calendar Periods
+        # MTD
+        mtd_target = last_dt.replace(day=1) - timedelta(days=1)
+        past_series = series[series.index <= mtd_target]
+        if not past_series.empty:
+             ticker_res['MTD'] = ((last_price - past_series.iloc[-1]) / past_series.iloc[-1]) * 100
+        else:
+             ticker_res['MTD'] = None
 
-    # 1. Standard Periods
-    results['1D'] = get_pct_change(days=1)
-    results['1W'] = get_pct_change(days=7)
-    results['1M'] = get_pct_change(days=30)
-    results['3M'] = get_pct_change(days=91)
-    results['1Yr'] = get_pct_change(days=365)
-    results['3Yr'] = get_pct_change(days=365*3)
-    results['5Yr'] = get_pct_change(days=365*5)
-    # results['10Yr'] = get_pct_change(days=365*10) # Removed per user request
+        # QTD
+        curr_month = last_dt.month
+        q_month = ((curr_month - 1) // 3) * 3 + 1
+        qtd_target = datetime(last_dt.year, q_month, 1) - timedelta(days=1)
+        past_series = series[series.index <= qtd_target]
+        if not past_series.empty:
+             ticker_res['QTD'] = ((last_price - past_series.iloc[-1]) / past_series.iloc[-1]) * 100
+        else:
+             ticker_res['QTD'] = None
 
-    # 2. Calendar Periods
-    # MTD: End of last month
-    mtd_target = current_date.replace(day=1) - timedelta(days=1)
-    results['MTD'] = get_pct_change(hard_date=mtd_target)
+        # YTD
+        ytd_target = datetime(last_dt.year - 1, 12, 31)
+        past_series = series[series.index <= ytd_target]
+        if not past_series.empty:
+             ticker_res['YTD'] = ((last_price - past_series.iloc[-1]) / past_series.iloc[-1]) * 100
+        else:
+             ticker_res['YTD'] = None
+             
+        final_data.append(ticker_res)
+        
+    if not final_data:
+        return pd.DataFrame()
+        
+    # Convert to DataFrame
+    df_res = pd.DataFrame(final_data)
+    if 'Ticker' in df_res.columns:
+        # Match index to original df_prices columns (Tickers/Index Names)
+        # But wait, df_prices columns ARE the names (Index Names or Tickers depending on where this is called).
+        # In main, we renamed columns to 'Index Name'.
+        # Let's verify what df_prices.columns are.
+        # In fetch_data, we did: ticker_to_index = ... rename ...
+        # So columns are "MSCI ACWI", etc.
+        
+        # We need to set the index back to the column name
+        df_res.set_index('Ticker', inplace=True)
     
-    # QTD: End of last quarter
-    # (Simplified: if we are in Feb, QTD is since Dec 31)
-    curr_month = current_date.month
-    q_month = ((curr_month - 1) // 3) * 3 + 1
-    qtd_start = datetime(current_date.year, q_month, 1) - timedelta(days=1)
-    results['QTD'] = get_pct_change(hard_date=qtd_start)
-    
-    # YTD: End of last year
-    ytd_target = datetime(current_date.year - 1, 12, 31)
-    results['YTD'] = get_pct_change(hard_date=ytd_target)
-
-    return pd.DataFrame(results)
+    return df_res
 
 def filter_by_timeframe(df, timeframe):
     """Filters dataframe based on selected timeframe."""

@@ -678,19 +678,38 @@ def main():
             
             # Rename columns to ETF Name for Legend
             if not df_price_sliced.empty:
-                # DEBUG:
-                st.write("Columns:", df_price_sliced.columns.tolist())
-                st.write("Head:", df_price_sliced.head())
-
                 # Create renaming dict: Ticker -> ETF Name
                 rename_dict = {}
                 for col in df_price_sliced.columns:
                      meta = ETF_METADATA.get(col, {})
+                     # Price Chart: Show ETF Name
                      name = meta.get('Name', col)
                      rename_dict[col] = f"{name} ({col})"
                 
                 df_chart = df_price_sliced.rename(columns=rename_dict)
-                st.line_chart(df_chart)
+                
+                # Use Plotly instead of st.line_chart for robustness and consistency
+                fig_price = go.Figure()
+                for col in df_chart.columns:
+                    fig_price.add_trace(go.Scatter(
+                        x=df_chart.index,
+                        y=df_chart[col],
+                        mode='lines',
+                        name=col,
+                        hovertemplate=f"<b>{col}</b><br>%{{y:,.1f}}<extra></extra>"
+                    ))
+                
+                fig_price.update_layout(
+                    hovermode="x unified",
+                    margin=dict(l=0, r=0, t=10, b=0),
+                    height=400,
+                    yaxis_title="Price (JPY)" if not normalize else "Return (%)",
+                    template="plotly_white",
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                
+                st.plotly_chart(fig_price, use_container_width=True)
+
             else:
                 st.info("No data available for selected range.")
 

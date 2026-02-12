@@ -495,10 +495,15 @@ def main():
     multiselect_container = st.container()
     all_tickers = list(df_normalized.columns)
     
-    # Helper to get display name for ticker
+    # Helper to get display name for ticker (Performance Chart -> Index Name)
     def get_display_name(ticker):
         meta = ETF_METADATA.get(ticker, {})
-        # User requested ETF Name
+        # User requested Index Name back for Performance Chart
+        return f"{meta.get('Index', ticker)} ({ticker})"
+        
+    # Helper for Price Chart -> ETF Name
+    def get_etf_display_name(ticker):
+        meta = ETF_METADATA.get(ticker, {})
         etf_name = meta.get('Name', ticker)
         return f"{etf_name} ({ticker})"
 
@@ -521,7 +526,7 @@ def main():
     
     with multiselect_container:
         selected_tickers_chart = st.multiselect(
-            "Select ETF/Index:", 
+            "Compare Indices:", # Reverted Label
             all_tickers, 
             default=defaults,
             format_func=get_display_name
@@ -597,7 +602,7 @@ def main():
         
         for c in cols_nav + cols_fund:
              df_final[c] = pd.NA
-
+ 
     # Filter only existing columns
     final_cols = [c for c in final_cols_order if c in df_final.columns]
     
@@ -638,7 +643,7 @@ def main():
     # 3. Chart (Optional, kept at bottom)
     with st.expander("Show Price Chart"):
         # Select ETF
-        selected_etfs_price = st.multiselect("Select ETF/Index", df_prices.columns, default=[df_prices.columns[0]])
+        selected_etfs_price = st.multiselect("Select ETF/Index", df_prices.columns, default=[df_prices.columns[0]], format_func=get_etf_display_name)
         
         col1, col2 = st.columns([4, 1])
         with col1:
